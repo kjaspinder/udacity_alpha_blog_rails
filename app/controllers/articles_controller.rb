@@ -2,7 +2,7 @@ class ArticlesController < ApplicationController
 
   before_action :set_article, only: [:show, :edit, :update, :destroy]
   before_action :require_user, only: [:edit, :update, :create, :destroy, :new]
-  before_action :require_same_user, only: [:edit, :update, :destroy ]
+  before_action :require_same_user_or_admin, only: [:edit, :update, :destroy ]
 
   def show
   end
@@ -53,9 +53,9 @@ class ArticlesController < ApplicationController
     params.require(:article).permit(:title, :description)
   end
 
-  def require_same_user
-    if current_user != @article.user
-      flash[:alert] = "You can only edit your own Articles"
+  def require_same_user_or_admin
+    if (current_user != @article.user && !current_user.admin?)
+      flash[:alert] = "You can only edit or delete your own Articles"
       redirect_to @article
     end
   end
